@@ -1,5 +1,5 @@
 from models import Task
-from algorithms.dynamic_programming import solve_dp
+from algorithms.dynamic_programming import solve_dp, build_dp_table
 import random
 from algorithms.exhaustive import solve_exhaustive
 import pytest
@@ -89,3 +89,25 @@ def test_boundary_cases(solver, tasks, budget, expected_score):
 
     assert sum(task.duration for task in selected) == result.total_duration
     assert sum(task.score for task in selected) == result.total_score
+
+def test_dp_table():
+    tasks = [
+        Task("T1", "Recursion practice", 10, 60),
+        Task("T2", "Sorting practice", 20, 100),
+        Task("T3", "Dynamic programming practice", 30, 120)
+    ]
+
+    budget = 50
+    dp = build_dp_table(tasks, budget)
+
+    # Verify table dimensions and base cases.
+    assert len(dp) == 4
+    assert all(len(row) == 51 for row in dp)
+    assert all(value == 0 for value in dp[0])
+    assert all(row[0] == 0 for row in dp)
+
+    # Verify intermediate and optimal scores.
+    assert dp[1][10] == 60
+    assert dp[2][30] == 160
+    assert dp[3][40] == 180
+    assert dp[3][50] == 220
